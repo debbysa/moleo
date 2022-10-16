@@ -15,17 +15,24 @@ func NewCategoryRepository(db *gorm.DB) CategoryRepository {
 }
 
 func (c *categoryRepository) GetCategoryList(ctx context.Context) ([]*entity.Category, error) {
-	//TODO implement me
-	panic("implement me")
+	var categoryDetail []*entity.Category
+	result := c.db.Table("categories").Find(&categoryDetail)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return categoryDetail, nil
 }
 
-func (c *categoryRepository) GetCategoryById(ctx context.Context, id string) (*entity.Category, error) {
-	//TODO implement me
-	panic("implement me")
+func (c *categoryRepository) GetCategoryById(ctx context.Context, id int) (*entity.Category, error) {
+	var category *entity.Category
+	result := c.db.Table("categories").First(&category, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return category, nil
 }
 
-func (c *categoryRepository) CreateCategory(ctx context.Context, category entity.Category) (*entity.Category, error) {
-
+func (c *categoryRepository) CreateCategory(ctx context.Context, category entity.CategoryRequest) (*entity.CategoryRequest, error) {
 	result := c.db.Table("categories").Create(&category)
 	if result.Error != nil {
 		return nil, result.Error
@@ -33,12 +40,12 @@ func (c *categoryRepository) CreateCategory(ctx context.Context, category entity
 	return &category, nil
 }
 
-func (c *categoryRepository) UpdateCategory(ctx context.Context, categoryId int, category entity.Category) (*entity.Category, error) {
+func (c *categoryRepository) UpdateCategory(ctx context.Context, categoryId int, category entity.CategoryRequest) (*entity.CategoryRequest, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (c *categoryRepository) DeleteCategory(ctx context.Context, categoryId int) ([]*entity.Category, error) {
+func (c *categoryRepository) DeleteCategory(ctx context.Context, categoryId int) ([]*entity.CategoryRequest, error) {
 	//TODO implement me
 	panic("implement me")
 }

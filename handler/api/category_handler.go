@@ -3,7 +3,9 @@ package api
 import (
 	"github.com/debbysa/moleo/core/entity"
 	"github.com/debbysa/moleo/core/module"
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 type categoryHandler struct {
@@ -22,17 +24,36 @@ func NewCategoryHandler(categoryUsecase module.CategoryUsecase) CategoryHandler 
 }
 
 func (c *categoryHandler) GetCategoryList(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	categoryList, err := c.categoryUsecase.GetCategoryList(r.Context())
+	if err != nil {
+		buildInternalServerResponse(w, err)
+		return
+	}
+	buildSuccessResponse(w, categoryList)
 }
 
 func (c *categoryHandler) GetCategoryById(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	vars := mux.Vars(r)
+	categoryID := vars["id"]
+	parseCaregoryID, err := strconv.Atoi(categoryID)
+	if err != nil {
+		buildInternalServerResponse(w, err)
+		return
+	}
+
+	categoryData, err := c.categoryUsecase.GetCategoryById(r.Context(), parseCaregoryID)
+	if err != nil {
+		switch err {
+		default:
+			buildGetCategoryByIdError(w, err)
+			return
+		}
+	}
+	buildSuccessResponse(w, categoryData)
 }
 
 func (c *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
-	categoryCreateRequest := entity.Category{}
+	categoryCreateRequest := entity.CategoryRequest{}
 
 	ReadFromRequestBody(w, r, &categoryCreateRequest)
 
