@@ -33,9 +33,11 @@ func main() {
 	router.HandleFunc("/", handleHome)
 	router.HandleFunc("/login", handleLogin).Methods("POST")
 
-	router.HandleFunc("/category", categoryHandler.CreateCategory).Methods("POST")
 	router.HandleFunc("/category/{id}", categoryHandler.GetCategoryById).Methods("GET")
 	router.HandleFunc("/category", categoryHandler.GetCategoryList).Methods("GET")
+	router.HandleFunc("/category", categoryHandler.CreateCategory).Methods("POST")
+	router.HandleFunc("/category/{id}", categoryHandler.UpdateCategory).Methods("PUT")
+	router.HandleFunc("/category/{id}", categoryHandler.DeleteCategory).Methods("DELETE")
 
 	err = http.ListenAndServe(":3000", router)
 	if err != nil {

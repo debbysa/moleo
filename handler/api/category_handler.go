@@ -35,13 +35,13 @@ func (c *categoryHandler) GetCategoryList(w http.ResponseWriter, r *http.Request
 func (c *categoryHandler) GetCategoryById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	categoryID := vars["id"]
-	parseCaregoryID, err := strconv.Atoi(categoryID)
+	parseCategoryID, err := strconv.Atoi(categoryID)
 	if err != nil {
 		buildInternalServerResponse(w, err)
 		return
 	}
 
-	categoryData, err := c.categoryUsecase.GetCategoryById(r.Context(), parseCaregoryID)
+	categoryData, err := c.categoryUsecase.GetCategoryById(r.Context(), parseCategoryID)
 	if err != nil {
 		switch err {
 		default:
@@ -70,11 +70,39 @@ func (c *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 }
 
 func (c *categoryHandler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	vars := mux.Vars(r)
+	categoryId := vars["id"]
+	parseCategoryId, err := strconv.Atoi(categoryId)
+	if err != nil {
+		buildInternalServerResponse(w, err)
+		return
+	}
+
+	categoryUpdateRequest := entity.CategoryRequest{}
+	ReadFromRequestBody(w, r, &categoryUpdateRequest)
+	categoryResponse, err := c.categoryUsecase.UpdateCategory(r.Context(), parseCategoryId, categoryUpdateRequest)
+	if err != nil {
+		switch err {
+		default:
+			buildGetCategoryByIdError(w, err)
+			return
+		}
+	}
+	buildSuccessResponse(w, &categoryResponse)
+
 }
 
 func (c *categoryHandler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	vars := mux.Vars(r)
+	categoryId := vars["id"]
+	parseCategoryId, err := strconv.Atoi(categoryId)
+	if err != nil {
+		buildInternalServerResponse(w, err)
+		return
+	}
+	err = c.categoryUsecase.DeleteCategory(r.Context(), parseCategoryId)
+	if err != nil {
+		buildInternalServerResponse(w, err)
+	}
+	buildSuccessResponse(w, nil)
 }

@@ -40,12 +40,26 @@ func (c *categoryRepository) CreateCategory(ctx context.Context, category entity
 	return &category, nil
 }
 
-func (c *categoryRepository) UpdateCategory(ctx context.Context, categoryId int, category entity.CategoryRequest) (*entity.CategoryRequest, error) {
-	//TODO implement me
-	panic("implement me")
+func (c *categoryRepository) UpdateCategory(ctx context.Context, categoryId int, category entity.CategoryRequest) (*entity.Category, error) {
+	categoryData := entity.Category{
+		ID:   categoryId,
+		Name: category.Name,
+	}
+
+	result := c.db.Table("categories").Save(&categoryData)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &categoryData, nil
 }
 
-func (c *categoryRepository) DeleteCategory(ctx context.Context, categoryId int) ([]*entity.CategoryRequest, error) {
-	//TODO implement me
-	panic("implement me")
+func (c *categoryRepository) DeleteCategory(ctx context.Context, categoryId int) error {
+	category := entity.Category{
+		ID: categoryId,
+	}
+	result := c.db.Table("categories").Delete(&category)
+	if result.Error != nil {
+		return result.Error
+	}
+	return result.Error
 }
