@@ -2,6 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/debbysa/moleo/core/module"
+	"github.com/debbysa/moleo/core/repository/category"
+	"github.com/debbysa/moleo/handler/api"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 	"gorm.io/driver/mysql"
@@ -15,15 +18,26 @@ var db *gorm.DB
 func main() {
 	dsn := "root:root@tcp(127.0.0.1:3306)/moleo?charset=utf8mb4&parseTime=True&loc=Local"
 
-	_, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	categoryRepo := category.NewCategoryRepository(db)
+	categoryUseCase := module.NewCategoryUsecase(categoryRepo)
+	categoryHandler := api.NewCategoryHandler(categoryUseCase)
+
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", handleHome)
 	router.HandleFunc("/login", handleLogin).Methods("POST")
+
+	router.HandleFunc("/category/{id}", categoryHandler.GetCategoryById).Methods("GET")
+	router.HandleFunc("/category", categoryHandler.GetCategoryList).Methods("GET")
+	router.HandleFunc("/category", categoryHandler.CreateCategory).Methods("POST")
+	router.HandleFunc("/category/{id}", categoryHandler.UpdateCategory).Methods("PUT")
+	router.HandleFunc("/category/{id}", categoryHandler.DeleteCategory).Methods("DELETE")
 
 	err = http.ListenAndServe(":3000", router)
 	if err != nil {
